@@ -1,9 +1,9 @@
 function TrackDirGui( )
 global x yfig TablesData
 
-x.main=openfig('TrackDirYP.fig');
+x.main=openfig('TrackDirYP1.fig');
 x.handles=guihandles(x.main);
-x.filepath='F:\Hugo\HugoCorticalData\EdFiles\'
+x.filepath='i:\Hugo\HugoCorticalData\EdFiles\'
 
 load TablesData
 set(x.handles.MonkeySel,'Value',1);

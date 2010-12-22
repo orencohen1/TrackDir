@@ -268,6 +268,19 @@ switch cmnd
         x.win34=plot([x1 x1],[0 y2],'g','LineWidth',2);
         x.win43=plot([x2 x2],[0 y2],'g');
         x.win44=plot([x1 x2],[y2 y2],'g');
+        t2pst = get_target2psth( x.handles);
+        if ~isempty(t2pst),
+            ProSpikes =  get_spikes4targets( x.spikes(x.PronIndex,:), x.targets(x.PronIndex), t2pst);
+            SupSpikes =  get_spikes4targets( x.spikes(x.SupIndex,:), x.targets(x.SupIndex), t2pst);
+            pstbin = str2double(get(x.handles.PSTBIN,'string'));
+            [prox,propst] = binvector( ProSpikes,pstbin, x.precue,x.postcue, x.window, x.prego, x.postgo);
+            [supx,suppst] = binvector( SupSpikes,pstbin, x.precue,x.postcue, x.window, x.prego, x.postgo);
+            [xp, yp] = stairs(prox, propst);
+            plot(x.handles.proPST,xp,yp,'r','linewidth',2)
+            [xp,yp]=stairs(supx, suppst);
+            plot(x.handles.supPST,xp,yp,'r','linewidth',2)
+                        
+        end
         %x.win2=patch([x1 x2 x2 x1 x1],[y1 y1 y2 y2 y1],[.1 .1 .1]), set(x.win2,'facealpha',.2)
 end%of switch
 
@@ -305,3 +318,25 @@ switch (lower( monks)),
 end
 
     
+function  t2pst = get_target2psth( xh)
+
+for i=1:8,
+    t2pst(i) = eval(['get( xh.TRG' num2str(i) ',''Value'');']);
+end
+t2pst = find(t2pst);
+    
+function Spikes =  get_spikes4targets( AllSpikes, targets, targets2pst)
+
+Spikes = AllSpikes(find(ismember(targets,targets2pst)),:);
+
+function [x,y] = binvector( pst,binsize, precue,postcue, deadwindow, prego, postgo)
+
+t1 = precue;
+t2 = t1+postcue-precue+deadwindow+(postgo-prego);
+pst = sum(pst);
+r = mod(length(pst),binsize);
+y = mean(reshape(pst(1:end-r),binsize,[]));
+x = t1:binsize:t2;
+x = x(1:length(y));
+
+
